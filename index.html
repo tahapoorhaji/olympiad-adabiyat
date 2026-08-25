@@ -1,0 +1,623 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>کارگروه المپیاد ادبی</title>
+
+    <!-- ===== Vazirmatn Font ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ============================================================
+               CONFIGURATION
+               ============================================================ */
+        :root {
+            --font-family: 'Vazirmatn', 'Segoe UI', system-ui, sans-serif;
+            --font-poetry: 'IranNastaliq', 'Vazirmatn', 'Segoe UI', serif;
+
+            /* Light Mode */
+            --bg-page: #f5f3ef;
+            --bg-surface: #ffffff;
+            --text-primary: #1a1816;
+            --text-secondary: #5a4f47;
+            --text-muted: #8b7a6b;
+            --shadow-soft: 0 12px 40px rgba(20, 16, 14, 0.08);
+            --shadow-hover: 0 20px 60px rgba(20, 16, 14, 0.12);
+            --player-bg: #ffffff;
+            --toggle-bg: #e8e4de;
+            --toggle-dot: #ffffff;
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg-page: #141210;
+            --bg-surface: #1e1b18;
+            --text-primary: #e8e4de;
+            --text-secondary: #b5aaa0;
+            --text-muted: #8a7d72;
+            --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.45);
+            --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.55);
+            --player-bg: #1e1b18;
+            --toggle-bg: #3d3630;
+            --toggle-dot: #e8e4de;
+        }
+
+        /* ============================================================
+               FONT FACE — IranNastaliq (local)
+               ============================================================ */
+        @font-face {
+            font-family: 'IranNastaliq';
+            src: url('./IranNastaliq.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* ============================================================
+               RESET & BASE
+               ============================================================ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+               BACKGROUND — Literary Poetry (Nastaliq)
+               ============================================================ */
+        .bg-poetry {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            font-family: var(--font-poetry);
+            font-weight: 400;
+            color: var(--text-primary);
+            opacity: 0.04;
+            user-select: none;
+            line-height: 1.5;
+            transition: opacity 0.8s ease, color 0.5s ease;
+            font-size: clamp(2.5rem, 6vw, 6rem);
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+
+            /* بهینه‌سازی ویژه برای نستعلیق */
+            font-feature-settings: "ss01" on, "ss02" on, "ss03" on, "ss04" on, "ss05" on, "calt" on, "liga" on, "dlig" on;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        .bg-poetry--1 {
+            top: 4%;
+            right: -2%;
+            transform: rotate(-4deg);
+            font-size: clamp(2.8rem, 7vw, 7rem);
+            opacity: 0.035;
+        }
+        .bg-poetry--2 {
+            bottom: 8%;
+            left: -3%;
+            transform: rotate(3deg);
+            font-size: clamp(2rem, 5vw, 5rem);
+            opacity: 0.03;
+        }
+        .bg-poetry--3 {
+            top: 50%;
+            left: 2%;
+            transform: translateY(-50%) rotate(-2deg);
+            font-size: clamp(1.8rem, 4vw, 4.2rem);
+            opacity: 0.025;
+            white-space: normal;
+            max-width: 20vw;
+            line-height: 1.7;
+        }
+        .bg-poetry--4 {
+            bottom: 20%;
+            right: 0%;
+            transform: rotate(5deg);
+            font-size: clamp(2.2rem, 5vw, 5.5rem);
+            opacity: 0.03;
+        }
+
+        @media (max-width: 768px) {
+            .bg-poetry--1 {
+                top: 2%;
+                right: -8%;
+                font-size: clamp(2rem, 8vw, 3.5rem);
+                opacity: 0.025;
+            }
+            .bg-poetry--2 {
+                bottom: 4%;
+                left: -10%;
+                font-size: clamp(1.6rem, 6vw, 2.8rem);
+                opacity: 0.02;
+            }
+            .bg-poetry--3 {
+                display: none;
+            }
+            .bg-poetry--4 {
+                bottom: 12%;
+                right: -5%;
+                font-size: clamp(1.8rem, 6vw, 3rem);
+                opacity: 0.02;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bg-poetry--1 {
+                font-size: clamp(1.6rem, 10vw, 2.8rem);
+                opacity: 0.02;
+            }
+            .bg-poetry--2 {
+                font-size: clamp(1.2rem, 7vw, 2.2rem);
+                opacity: 0.018;
+            }
+            .bg-poetry--4 {
+                font-size: clamp(1.4rem, 7vw, 2.4rem);
+                opacity: 0.018;
+            }
+        }
+
+        /* ============================================================
+               MAIN WRAPPER
+               ============================================================ */
+        .site-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 1rem 0 2rem;
+        }
+
+        /* ============================================================
+               HEADER
+               ============================================================ */
+        .site-header {
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 0 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        .site-title {
+            font-size: clamp(1.4rem, 3.2vw, 2.6rem);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+            color: var(--text-primary);
+            transition: color 0.5s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+        .site-title .accent {
+            font-weight: 300;
+            color: var(--text-secondary);
+            transition: color 0.5s ease;
+        }
+
+        /* ---- Theme Toggle ---- */
+        .theme-toggle {
+            flex-shrink: 0;
+            width: 52px;
+            height: 28px;
+            background: var(--toggle-bg);
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.4s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-top: 0.25rem;
+            outline: none;
+            appearance: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .theme-toggle:hover {
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.14);
+        }
+        .theme-toggle:focus-visible {
+            box-shadow: 0 0 0 3px var(--text-muted);
+        }
+
+        .theme-toggle .dot {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--toggle-dot);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.4s ease;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+        [data-theme="dark"] .theme-toggle .dot {
+            transform: translateX(-24px);
+        }
+
+        .theme-toggle .dot::after {
+            content: '☀️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            line-height: 1;
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+        [data-theme="dark"] .theme-toggle .dot::after {
+            content: '🌙';
+        }
+
+        @media (max-width: 480px) {
+            .site-header {
+                flex-wrap: wrap;
+            }
+            .site-title {
+                font-size: clamp(1.2rem, 5vw, 1.6rem);
+                min-width: unset;
+            }
+            .theme-toggle {
+                width: 46px;
+                height: 26px;
+                margin-top: 0.1rem;
+            }
+            .theme-toggle .dot {
+                width: 20px;
+                height: 20px;
+                top: 3px;
+                right: 3px;
+            }
+            [data-theme="dark"] .theme-toggle .dot {
+                transform: translateX(-20px);
+            }
+            .theme-toggle .dot::after {
+                font-size: 10px;
+            }
+        }
+
+        /* ============================================================
+               VIDEO PLAYER
+               ============================================================ */
+        .video-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            position: relative;
+            background: var(--player-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: box-shadow 0.4s ease, background 0.5s ease;
+            aspect-ratio: 16 / 9;
+            max-width: 1000px;
+        }
+        .video-wrapper:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .video-wrapper video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #0a0808;
+            border-radius: 16px;
+            outline: none;
+        }
+
+        /* ---- Video Title ---- */
+        .video-title {
+            font-size: clamp(1rem, 1.6vw, 1.4rem);
+            font-weight: 400;
+            color: var(--text-secondary);
+            text-align: center;
+            letter-spacing: 0.01em;
+            line-height: 1.6;
+            transition: color 0.5s ease;
+            padding: 0 0.5rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* ---- Fallback message (only text, no button) ---- */
+        .video-wrapper .fallback-msg {
+            display: none;
+            position: absolute;
+            inset: 0;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 16px;
+            font-weight: 300;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .video-wrapper .fallback-msg.visible {
+            display: flex;
+        }
+        .video-wrapper .fallback-msg .hint {
+            font-size: 0.8rem;
+            opacity: 0.65;
+        }
+
+        /* ============================================================
+               ANIMATIONS
+               ============================================================ */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(16px);
+            animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .animate-in--delay-1 {
+            animation-delay: 0.05s;
+        }
+        .animate-in--delay-2 {
+            animation-delay: 0.20s;
+        }
+        .animate-in--delay-3 {
+            animation-delay: 0.35s;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animate-in {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* ============================================================
+               RESPONSIVE
+               ============================================================ */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.25rem 1rem;
+            }
+            .site-wrapper {
+                gap: 1.5rem;
+                padding: 0.5rem 0 1.5rem;
+            }
+            .video-wrapper {
+                border-radius: 12px;
+            }
+            .video-wrapper video {
+                border-radius: 12px;
+            }
+            .video-title {
+                font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0.75rem 0.75rem;
+            }
+            .site-wrapper {
+                gap: 1rem;
+                padding: 0.25rem 0 1rem;
+            }
+            .video-wrapper {
+                border-radius: 10px;
+            }
+            .video-wrapper video {
+                border-radius: 10px;
+            }
+            .video-title {
+                font-size: clamp(0.8rem, 3vw, 0.95rem);
+                padding: 0 0.25rem;
+            }
+        }
+
+        ::selection {
+            background: var(--text-muted);
+            color: var(--bg-page);
+        }
+        [data-theme="dark"] ::selection {
+            background: var(--text-muted);
+            color: var(--bg-page);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== BACKGROUND POETRY (Nastaliq) ===== -->
+    <div class="bg-poetry bg-poetry--1" aria-hidden="true">چو ایران نباشد تن من مباد</div>
+    <div class="bg-poetry bg-poetry--2" aria-hidden="true">توانا بود هر که دانا بود</div>
+    <div class="bg-poetry bg-poetry--3" aria-hidden="true">به نام خداوند جان و خرد</div>
+    <div class="bg-poetry bg-poetry--4" aria-hidden="true">سخن گفتن از دانش و خرد است</div>
+
+    <!-- ===== MAIN WRAPPER ===== -->
+    <div class="site-wrapper">
+
+        <!-- HEADER -->
+        <header class="site-header animate-in animate-in--delay-1">
+            <h1 class="site-title" id="siteTitle">
+                کارگروه المپیاد ادبی
+                <span class="accent">[نام مجموعه]</span>
+            </h1>
+            <button class="theme-toggle" id="themeToggle" aria-label="تغییر حالت روشن/تاریک">
+                <span class="dot"></span>
+            </button>
+        </header>
+
+        <!-- VIDEO SECTION -->
+        <section class="video-section animate-in animate-in--delay-2">
+            <div class="video-wrapper">
+                <video id="mainVideo" controls preload="metadata" playsinline>
+                    <source src="assets/video.mp4" type="video/mp4" />
+                </video>
+                <div class="fallback-msg" id="fallbackMsg">
+                    <span>ویدیو یافت نشد.</span>
+                    <span class="hint">لطفاً فایل را در مسیر صحیح قرار دهید.</span>
+                </div>
+            </div>
+            <p class="video-title" id="videoTitle"></p>
+        </section>
+
+    </div>
+
+    <script>
+        // ============================================================
+        //  CONFIGURATION — فقط این مقادیر را تغییر دهید
+        // ============================================================
+        const CONFIG = {
+            SITE_TITLE: 'کارگروه فارغ التحصیلان المپیاد ادبی',
+            VIDEO_FILE: 'video.mp4',   // مسیر نسبی از ریشه
+            VIDEO_TITLE: 'کلاس شعر معاصر المپیاد ادبی سال 1385 با تدریس مرحوم قیصر امین پور'
+        };
+        // ============================================================
+
+        (function() {
+            'use strict';
+
+            const titleEl = document.getElementById('siteTitle');
+            const videoEl = document.getElementById('mainVideo');
+            const titleTextEl = document.getElementById('videoTitle');
+            const fallbackMsg = document.getElementById('fallbackMsg');
+
+            // اعمال تنظیمات
+            if (titleEl) titleEl.innerHTML = CONFIG.SITE_TITLE;
+            if (titleTextEl) titleTextEl.textContent = CONFIG.VIDEO_TITLE;
+
+            // بارگذاری ویدیو از مسیر مشخص
+            function loadVideo(path) {
+                const source = videoEl.querySelector('source');
+                if (source) {
+                    source.src = path;
+                    videoEl.load();
+                } else {
+                    const src = document.createElement('source');
+                    src.src = path;
+                    src.type = 'video/mp4';
+                    videoEl.appendChild(src);
+                    videoEl.load();
+                }
+                fallbackMsg.classList.remove('visible');
+            }
+
+            loadVideo(CONFIG.VIDEO_FILE);
+
+            // در صورت خطا، پیغام نمایش داده شود
+            videoEl.addEventListener('error', function() {
+                if (videoEl.error && videoEl.error.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+                    fallbackMsg.classList.add('visible');
+                }
+            });
+
+            // همچنین اگر بعد از ۳ ثانیه ویدیو بارگذاری نشد
+            setTimeout(() => {
+                if (videoEl.readyState === 0) {
+                    fallbackMsg.classList.add('visible');
+                }
+            }, 3000);
+
+            // ---- Dark / Light Mode ----
+            const toggle = document.getElementById('themeToggle');
+            const STORAGE_KEY = 'lit-olympiad-theme';
+
+            function getPreferredTheme() {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored === 'dark' || stored === 'light') return stored;
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light';
+            }
+
+            function setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem(STORAGE_KEY, theme);
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme') || 'light';
+                setTheme(current === 'light' ? 'dark' : 'light');
+            }
+
+            setTheme(getPreferredTheme());
+
+            if (toggle) {
+                toggle.addEventListener('click', toggleTheme);
+                toggle.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleTheme();
+                    }
+                });
+            }
+
+            if (window.matchMedia) {
+                const media = window.matchMedia('(prefers-color-scheme: dark)');
+                const handler = function(e) {
+                    if (!localStorage.getItem(STORAGE_KEY)) {
+                        setTheme(e.matches ? 'dark' : 'light');
+                    }
+                };
+                try {
+                    media.addEventListener('change', handler);
+                } catch (_) {
+                    media.addListener(handler);
+                }
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
