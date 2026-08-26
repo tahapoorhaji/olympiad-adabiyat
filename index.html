@@ -216,11 +216,12 @@
             font-size: clamp(1.4rem, 3.2vw, 2.6rem);
             font-weight: 700;
             letter-spacing: -0.01em;
-            line-height: 1.3;
+            line-height: 1.4;
             color: var(--text-primary);
             transition: color 0.5s ease;
             flex: 1;
             min-width: 200px;
+            white-space: pre-wrap; /* برای حفظ خطوط جدید */
         }
         .site-title .accent {
             font-weight: 300;
@@ -311,7 +312,7 @@
         }
 
         /* ============================================================
-               VIDEO PLAYER
+               VIDEO PLAYER — بدون نسبت ثابت، تطبیق با ابعاد ویدیو
                ============================================================ */
         .video-section {
             width: 100%;
@@ -329,8 +330,8 @@
             overflow: hidden;
             box-shadow: var(--shadow-soft);
             transition: box-shadow 0.4s ease, background 0.5s ease;
-            aspect-ratio: 16 / 9;
             max-width: 1000px;
+            /* حذف aspect-ratio */
         }
         .video-wrapper:hover {
             box-shadow: var(--shadow-hover);
@@ -339,28 +340,28 @@
         .video-wrapper video {
             display: block;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto; /* ارتفاع بر اساس نسبت خود ویدیو */
             background: #0a0808;
             border-radius: 16px;
             outline: none;
         }
 
-        /* ---- Video Title ---- */
+        /* ---- Video Title (پشتیبانی از خط جدید) ---- */
         .video-title {
             font-size: clamp(1rem, 1.6vw, 1.4rem);
             font-weight: 400;
             color: var(--text-secondary);
             text-align: center;
             letter-spacing: 0.01em;
-            line-height: 1.6;
+            line-height: 1.8;
             transition: color 0.5s ease;
             padding: 0 0.5rem;
             width: 100%;
             max-width: 900px;
+            white-space: pre-wrap; /* برای حفظ خطوط جدید */
         }
 
-        /* ---- Fallback message (only text, no button) ---- */
+        /* ---- Fallback message (only text) ---- */
         .video-wrapper .fallback-msg {
             display: none;
             position: absolute;
@@ -515,27 +516,68 @@
     <script>
         // ============================================================
         //  CONFIGURATION — فقط این مقادیر را تغییر دهید
+        //  برای خط جدید در متن از \n استفاده کنید.
         // ============================================================
         const CONFIG = {
-            SITE_TITLE: 'کارگروه فارغ التحصیلان المپیاد ادبی',
+            SITE_TITLE: 'نشریهٔ پژواک؛ به‌کوشش/nکارگروه فارغ‌التحصیلان المپیاد ادبی',
             VIDEO_FILE: 'video.mp4',   // مسیر نسبی از ریشه
-            VIDEO_TITLE: 'کلاس شعر معاصر المپیاد ادبی سال 1385 با تدریس مرحوم قیصر امین پور'
+            VIDEO_TITLE: 'کلاس شعر معاصر المپیاد ادبی سال 1385\nبا تدریس مرحوم قیصر امین‌پور'
         };
         // ============================================================
 
         (function() {
             'use strict';
 
+            // ---- ابزار تبدیل اعداد انگلیسی به فارسی ----
+            function toPersianDigits(str) {
+                const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+                return str.replace(/\d/g, function(d) {
+                    return persian[parseInt(d, 10)];
+                });
+            }
+
+            // ---- تبدیل \n به <br> و اعمال اعداد فارسی ----
+            function formatTextWithNewlines(text) {
+                if (!text) return '';
+                // ابتدا اعداد را فارسی می‌کنیم
+                let formatted = toPersianDigits(text);
+                // سپس \n را به <br> تبدیل می‌کنیم
+                formatted = formatted.replace(/\n/g, '<br>');
+                return formatted;
+            }
+
+            // ---- عناصر DOM ----
             const titleEl = document.getElementById('siteTitle');
             const videoEl = document.getElementById('mainVideo');
             const titleTextEl = document.getElementById('videoTitle');
             const fallbackMsg = document.getElementById('fallbackMsg');
 
-            // اعمال تنظیمات
-            if (titleEl) titleEl.innerHTML = CONFIG.SITE_TITLE;
-            if (titleTextEl) titleTextEl.textContent = CONFIG.VIDEO_TITLE;
+            // ---- اعمال تنظیمات با پشتیبانی از خط جدید ----
+            if (titleEl) {
+                // برای عنوان اصلی، قسمت accent را جدا می‌کنیم (اگر درون CONFIG.SITE_TITLE باشد)
+                // اما برای سادگی، کل عنوان را با فرمت جدید نمایش می‌دهیم.
+                // برای حفظ ساختار (accent) بهتر است عنوان را به دو بخش تقسیم کنیم،
+                // اما کاربر می‌تواند کل عنوان را در SITE_TITLE بنویسد و ما آن را نمایش دهیم.
+                // برای حفظ قابلیت تغییر accent، اگر کاربر از الگوی «... [نام مجموعه]» استفاده کند،
+                // ما آن را تشخیص می‌دهیم و به دو بخش تقسیم می‌کنیم.
+                const fullTitle = CONFIG.SITE_TITLE;
+                // اگر داخل متن [نام مجموعه] وجود داشت، آن را جدا می‌کنیم
+                const match = fullTitle.match(/^(.*?)\s*(\[نام مجموعه\])\s*$/);
+                if (match) {
+                    const mainPart = formatTextWithNewlines(match[1].trim());
+                    const accentPart = match[2];
+                    titleEl.innerHTML = `${mainPart} <span class="accent">${accentPart}</span>`;
+                } else {
+                    // در غیر این صورت کل متن را با فرمت جدید نمایش بده
+                    titleEl.innerHTML = formatTextWithNewlines(fullTitle);
+                }
+            }
 
-            // بارگذاری ویدیو از مسیر مشخص
+            if (titleTextEl) {
+                titleTextEl.innerHTML = formatTextWithNewlines(CONFIG.VIDEO_TITLE);
+            }
+
+            // ---- بارگذاری ویدیو ----
             function loadVideo(path) {
                 const source = videoEl.querySelector('source');
                 if (source) {
@@ -553,14 +595,14 @@
 
             loadVideo(CONFIG.VIDEO_FILE);
 
-            // در صورت خطا، پیغام نمایش داده شود
+            // ---- خطا در بارگذاری ویدیو ----
             videoEl.addEventListener('error', function() {
                 if (videoEl.error && videoEl.error.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
                     fallbackMsg.classList.add('visible');
                 }
             });
 
-            // همچنین اگر بعد از ۳ ثانیه ویدیو بارگذاری نشد
+            // اگر بعد از ۳ ثانیه ویدیو بارگذاری نشد
             setTimeout(() => {
                 if (videoEl.readyState === 0) {
                     fallbackMsg.classList.add('visible');
