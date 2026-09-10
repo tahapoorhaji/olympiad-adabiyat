@@ -29,6 +29,7 @@
             --player-bg: #ffffff;
             --toggle-bg: #e8e4de;
             --toggle-dot: #ffffff;
+            --disc-bg: #efeae3;
         }
 
         /* Dark Mode */
@@ -43,6 +44,7 @@
             --player-bg: #1e1b18;
             --toggle-bg: #3d3630;
             --toggle-dot: #e8e4de;
+            --disc-bg: #2a2521;
         }
 
         /* ============================================================
@@ -312,9 +314,9 @@
         }
 
         /* ============================================================
-               VIDEO PLAYER — بدون نسبت ثابت، تطبیق با ابعاد ویدیو
+               MEDIA PLAYER — ویدیو یا صدا (تشخیص خودکار)
                ============================================================ */
-        .video-section {
+        .media-section {
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -322,22 +324,22 @@
             gap: 1.25rem;
         }
 
-        .video-wrapper {
+        .media-wrapper {
             width: 100%;
+            max-width: 1000px;
             position: relative;
             background: var(--player-bg);
             border-radius: 16px;
             overflow: hidden;
             box-shadow: var(--shadow-soft);
             transition: box-shadow 0.4s ease, background 0.5s ease;
-            max-width: 1000px;
-            /* حذف aspect-ratio */
         }
-        .video-wrapper:hover {
+        .media-wrapper:hover {
             box-shadow: var(--shadow-hover);
         }
 
-        .video-wrapper video {
+        /* ---- ویدیو ---- */
+        .media-wrapper > video {
             display: block;
             width: 100%;
             height: auto; /* ارتفاع بر اساس نسبت خود ویدیو */
@@ -346,23 +348,66 @@
             outline: none;
         }
 
-        /* ---- Video Title (پشتیبانی از خط جدید) ---- */
-        .video-title {
-            font-size: clamp(1rem, 1.6vw, 1.4rem);
-            font-weight: 400;
-            color: var(--text-secondary);
-            text-align: center;
-            letter-spacing: 0.01em;
-            line-height: 1.8;
-            transition: color 0.5s ease;
-            padding: 0 0.5rem;
-            width: 100%;
-            max-width: 900px;
-            white-space: pre-wrap; /* برای حفظ خطوط جدید */
+        /* ---- حالت صوتی ---- */
+        .media-wrapper.is-audio {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2.5rem 1.75rem;
         }
 
-        /* ---- Fallback message (only text) ---- */
-        .video-wrapper .fallback-msg {
+        .media-wrapper.is-audio > audio {
+            display: block;
+            width: 100%;
+            max-width: 620px;
+            outline: none;
+            border-radius: 999px;
+        }
+
+        /* ---- تصویر تزئینی حالت صوتی ---- */
+        .media-art {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .media-wrapper.is-audio .media-art {
+            display: flex;
+        }
+
+        .media-disc {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            background: var(--disc-bg);
+            display: grid;
+            place-items: center;
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            position: relative;
+            box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.05),
+                0 8px 22px rgba(0, 0, 0, 0.10);
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        .media-disc::after {
+            content: '';
+            position: absolute;
+            inset: 15px;
+            border-radius: 50%;
+            border: 1px dashed var(--text-muted);
+            opacity: 0.45;
+        }
+        .media-wrapper.is-playing .media-disc {
+            animation: discSpin 4s linear infinite;
+        }
+
+        @keyframes discSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---- پیام جایگزین ---- */
+        .media-wrapper .fallback-msg {
             display: none;
             position: absolute;
             inset: 0;
@@ -378,12 +423,36 @@
             flex-direction: column;
             gap: 0.4rem;
         }
-        .video-wrapper .fallback-msg.visible {
+        .media-wrapper .fallback-msg.visible {
             display: flex;
         }
-        .video-wrapper .fallback-msg .hint {
+        .media-wrapper .fallback-msg .hint {
             font-size: 0.8rem;
             opacity: 0.65;
+        }
+
+        /* وقتی خطا رخ داد، عنصر رسانه پنهان و ظرف دارای ارتفاع حداقلی می‌شود */
+        .media-wrapper.has-error {
+            min-height: 220px;
+        }
+        .media-wrapper.has-error > video,
+        .media-wrapper.has-error > audio {
+            display: none;
+        }
+
+        /* ---- عنوان رسانه (پشتیبانی از خط جدید) ---- */
+        .media-title {
+            font-size: clamp(1rem, 1.6vw, 1.4rem);
+            font-weight: 400;
+            color: var(--text-secondary);
+            text-align: center;
+            letter-spacing: 0.01em;
+            line-height: 1.8;
+            transition: color 0.5s ease;
+            padding: 0 0.5rem;
+            width: 100%;
+            max-width: 900px;
+            white-space: pre-wrap; /* برای حفظ خطوط جدید */
         }
 
         /* ============================================================
@@ -421,6 +490,9 @@
                 opacity: 1;
                 transform: none;
             }
+            .media-wrapper.is-playing .media-disc {
+                animation: none;
+            }
         }
 
         /* ============================================================
@@ -434,13 +506,17 @@
                 gap: 1.5rem;
                 padding: 0.5rem 0 1.5rem;
             }
-            .video-wrapper {
+            .media-wrapper {
                 border-radius: 12px;
             }
-            .video-wrapper video {
+            .media-wrapper > video {
                 border-radius: 12px;
             }
-            .video-title {
+            .media-wrapper.is-audio {
+                padding: 2rem 1.25rem;
+                gap: 1.25rem;
+            }
+            .media-title {
                 font-size: clamp(0.9rem, 2.2vw, 1.1rem);
             }
         }
@@ -453,13 +529,22 @@
                 gap: 1rem;
                 padding: 0.25rem 0 1rem;
             }
-            .video-wrapper {
+            .media-wrapper {
                 border-radius: 10px;
             }
-            .video-wrapper video {
+            .media-wrapper > video {
                 border-radius: 10px;
             }
-            .video-title {
+            .media-wrapper.is-audio {
+                padding: 1.5rem 1rem;
+                gap: 1rem;
+            }
+            .media-disc {
+                width: 70px;
+                height: 70px;
+                font-size: 1.4rem;
+            }
+            .media-title {
                 font-size: clamp(0.8rem, 3vw, 0.95rem);
                 padding: 0 0.25rem;
             }
@@ -497,18 +582,20 @@
             </button>
         </header>
 
-        <!-- VIDEO SECTION -->
-        <section class="video-section animate-in animate-in--delay-2">
-            <div class="video-wrapper">
-                <video id="mainVideo" controls preload="metadata" playsinline>
-                    <source src="assets/video.mp4" type="video/mp4" />
-                </video>
+        <!-- MEDIA SECTION -->
+        <section class="media-section animate-in animate-in--delay-2">
+            <div class="media-wrapper" id="mediaWrapper">
+                <!-- تصویر تزئینی، فقط در حالت صوتی نمایش داده می‌شود -->
+                <div class="media-art" aria-hidden="true">
+                    <div class="media-disc">♪</div>
+                </div>
+
                 <div class="fallback-msg" id="fallbackMsg">
-                    <span>ویدیو یافت نشد.</span>
-                    <span class="hint">لطفاً فایل را در مسیر صحیح قرار دهید.</span>
+                    <span>فایل رسانه یافت نشد.</span>
+                    <span class="hint">لطفاً فایل صوتی یا ویدیویی را در مسیر صحیح قرار دهید.</span>
                 </div>
             </div>
-            <p class="video-title" id="videoTitle"></p>
+            <p class="media-title" id="mediaTitle"></p>
         </section>
 
     </div>
@@ -520,18 +607,63 @@
         // ============================================================
         const CONFIG = {
             SITE_TITLE: 'نشریهٔ پژواک؛ به‌کوشش\nکارگروه فارغ‌التحصیلان المپیاد ادبی',
-            VIDEO_FILE: 'video.mp4',   // مسیر نسبی از ریشه
-            VIDEO_TITLE: 'کلاس شعر معاصر المپیاد ادبی سال 1385\nبا تدریس مرحوم قیصر امین‌پور'
+
+            // مسیر فایل رسانه (ویدیو یا صدا) — مسیر نسبی از ریشه
+            // نمونه‌ها: 'video.mp4'  |  'assets/audio.mp3'  |  'lecture.m4a'
+            MEDIA_FILE: 'audio.mp3',
+
+            // نوع رسانه:
+            //   'auto'  → تشخیص خودکار از روی پسوند فایل (پیشنهادی)
+            //   'video' → همیشه به‌صورت ویدیو پخش شود
+            //   'audio' → همیشه به‌صورت صدا پخش شود
+            MEDIA_TYPE: 'auto',
+
+            MEDIA_TITLE: 'کلاس شعر معاصر المپیاد ادبی سال 1385\nبا تدریس مرحوم قیصر امین‌پور'
         };
         // ============================================================
 
         (function() {
             'use strict';
 
+            // ---- پسوندهای شناخته‌شده ----
+            const AUDIO_EXT = ['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'flac',
+                               'opus', 'weba', 'wma', 'mka', 'aiff', 'aif', 'amr'];
+            const VIDEO_EXT = ['mp4', 'webm', 'ogv', 'mov', 'm4v', 'mkv', 'avi',
+                               'mpeg', 'mpg', '3gp', 'ts', 'm2ts'];
+
+            const MIME_MAP = {
+                mp3:  'audio/mpeg',
+                wav:  'audio/wav',
+                ogg:  'audio/ogg',
+                oga:  'audio/ogg',
+                m4a:  'audio/mp4',
+                aac:  'audio/aac',
+                flac: 'audio/flac',
+                opus: 'audio/opus',
+                weba: 'audio/webm',
+                wma:  'audio/x-ms-wma',
+                mka:  'audio/x-matroska',
+                aiff: 'audio/aiff',
+                aif:  'audio/aiff',
+                amr:  'audio/amr',
+                mp4:  'video/mp4',
+                webm: 'video/webm',
+                ogv:  'video/ogg',
+                mov:  'video/quicktime',
+                m4v:  'video/mp4',
+                mkv:  'video/x-matroska',
+                avi:  'video/x-msvideo',
+                mpeg: 'video/mpeg',
+                mpg:  'video/mpeg',
+                '3gp': 'video/3gpp',
+                ts:   'video/mp2t',
+                m2ts: 'video/mp2t'
+            };
+
             // ---- ابزار تبدیل اعداد انگلیسی به فارسی ----
             function toPersianDigits(str) {
                 const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-                return str.replace(/\d/g, function(d) {
+                return String(str).replace(/\d/g, function(d) {
                     return persian[parseInt(d, 10)];
                 });
             }
@@ -539,75 +671,156 @@
             // ---- تبدیل \n به <br> و اعمال اعداد فارسی ----
             function formatTextWithNewlines(text) {
                 if (!text) return '';
-                // ابتدا اعداد را فارسی می‌کنیم
                 let formatted = toPersianDigits(text);
-                // سپس \n را به <br> تبدیل می‌کنیم
                 formatted = formatted.replace(/\n/g, '<br>');
                 return formatted;
             }
 
-            // ---- عناصر DOM ----
-            const titleEl = document.getElementById('siteTitle');
-            const videoEl = document.getElementById('mainVideo');
-            const titleTextEl = document.getElementById('videoTitle');
-            const fallbackMsg = document.getElementById('fallbackMsg');
+            // ---- گرفتن پسوند فایل ----
+            function extOf(path) {
+                const clean = String(path).split(/[?#]/)[0];
+                const i = clean.lastIndexOf('.');
+                if (i === -1) return '';
+                return clean.slice(i + 1).toLowerCase();
+            }
 
-            // ---- اعمال تنظیمات با پشتیبانی از خط جدید ----
+            // ---- تشخیص نوع رسانه ----
+            function resolveMediaType(path, mode) {
+                if (mode === 'audio' || mode === 'video') return mode;
+                const ext = extOf(path);
+                if (AUDIO_EXT.indexOf(ext) !== -1) return 'audio';
+                if (VIDEO_EXT.indexOf(ext) !== -1) return 'video';
+                // ناشناخته → پیش‌فرض ویدیو (مرورگر خودش تصمیم می‌گیرد)
+                return 'video';
+            }
+
+            // ---- عناصر DOM ----
+            const titleEl      = document.getElementById('siteTitle');
+            const wrapper      = document.getElementById('mediaWrapper');
+            const fallbackMsg  = document.getElementById('fallbackMsg');
+            const titleTextEl  = document.getElementById('mediaTitle');
+
+            let mediaEl = null;          // عنصر <video> یا <audio> جاری
+            let fallbackTimer = null;    // تایمر بررسی بارگذاری
+
+            // ---- اعمال عنوان سایت ----
             if (titleEl) {
-                // برای عنوان اصلی، قسمت accent را جدا می‌کنیم (اگر درون CONFIG.SITE_TITLE باشد)
-                // اما برای سادگی، کل عنوان را با فرمت جدید نمایش می‌دهیم.
-                // برای حفظ ساختار (accent) بهتر است عنوان را به دو بخش تقسیم کنیم،
-                // اما کاربر می‌تواند کل عنوان را در SITE_TITLE بنویسد و ما آن را نمایش دهیم.
-                // برای حفظ قابلیت تغییر accent، اگر کاربر از الگوی «... [نام مجموعه]» استفاده کند،
-                // ما آن را تشخیص می‌دهیم و به دو بخش تقسیم می‌کنیم.
-                const fullTitle = CONFIG.SITE_TITLE;
-                // اگر داخل متن [نام مجموعه] وجود داشت، آن را جدا می‌کنیم
+                const fullTitle = CONFIG.SITE_TITLE || '';
                 const match = fullTitle.match(/^(.*?)\s*(\[نام مجموعه\])\s*$/);
                 if (match) {
                     const mainPart = formatTextWithNewlines(match[1].trim());
                     const accentPart = match[2];
                     titleEl.innerHTML = `${mainPart} <span class="accent">${accentPart}</span>`;
                 } else {
-                    // در غیر این صورت کل متن را با فرمت جدید نمایش بده
                     titleEl.innerHTML = formatTextWithNewlines(fullTitle);
                 }
             }
 
+            // ---- اعمال عنوان رسانه ----
             if (titleTextEl) {
-                titleTextEl.innerHTML = formatTextWithNewlines(CONFIG.VIDEO_TITLE);
+                const mediaTitle = CONFIG.MEDIA_TITLE || CONFIG.VIDEO_TITLE || '';
+                titleTextEl.innerHTML = formatTextWithNewlines(mediaTitle);
             }
 
-            // ---- بارگذاری ویدیو ----
-            function loadVideo(path) {
-                const source = videoEl.querySelector('source');
-                if (source) {
-                    source.src = path;
-                    videoEl.load();
-                } else {
-                    const src = document.createElement('source');
-                    src.src = path;
-                    src.type = 'video/mp4';
-                    videoEl.appendChild(src);
-                    videoEl.load();
-                }
+            // ---- نمایش / پنهان‌سازی پیام خطا ----
+            function showFallback() {
+                fallbackMsg.classList.add('visible');
+                wrapper.classList.add('has-error');
+            }
+
+            function hideFallback() {
                 fallbackMsg.classList.remove('visible');
+                wrapper.classList.remove('has-error');
             }
 
-            loadVideo(CONFIG.VIDEO_FILE);
+            // ---- اتصال رویدادها به عنصر رسانه ----
+            function attachEvents(el) {
+                const onReady = function() {
+                    clearTimeout(fallbackTimer);
+                    hideFallback();
+                };
 
-            // ---- خطا در بارگذاری ویدیو ----
-            videoEl.addEventListener('error', function() {
-                if (videoEl.error && videoEl.error.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
-                    fallbackMsg.classList.add('visible');
-                }
-            });
+                el.addEventListener('loadedmetadata', onReady);
+                el.addEventListener('loadeddata', onReady);
+                el.addEventListener('canplay', onReady);
 
-            // اگر بعد از ۳ ثانیه ویدیو بارگذاری نشد
-            setTimeout(() => {
-                if (videoEl.readyState === 0) {
-                    fallbackMsg.classList.add('visible');
+                el.addEventListener('error', function() {
+                    clearTimeout(fallbackTimer);
+                    // اگر عنصر جاری عوض شده باشد، ignore
+                    if (el !== mediaEl) return;
+                    showFallback();
+                });
+
+                el.addEventListener('play', function() {
+                    wrapper.classList.add('is-playing');
+                });
+                el.addEventListener('pause', function() {
+                    wrapper.classList.remove('is-playing');
+                });
+                el.addEventListener('ended', function() {
+                    wrapper.classList.remove('is-playing');
+                });
+            }
+
+            // ---- ساخت و بارگذاری عنصر رسانه ----
+            function loadMedia(path, mode) {
+                // پاک‌سازی عنصر قبلی
+                if (mediaEl) {
+                    try {
+                        mediaEl.pause();
+                    } catch (_) {}
+                    mediaEl.remove();
+                    mediaEl = null;
                 }
-            }, 3000);
+
+                clearTimeout(fallbackTimer);
+                hideFallback();
+                wrapper.classList.remove('is-playing');
+
+                const type = resolveMediaType(path, mode);
+                const isAudio = (type === 'audio');
+
+                mediaEl = document.createElement(isAudio ? 'audio' : 'video');
+                mediaEl.id = 'mainMedia';
+                mediaEl.controls = true;
+                mediaEl.preload = 'metadata';
+                mediaEl.setAttribute('controlsList', 'nodownload');
+
+                if (!isAudio) {
+                    mediaEl.setAttribute('playsinline', '');
+                    mediaEl.setAttribute('webkit-playsinline', '');
+                    mediaEl.playsInline = true;
+                }
+
+                const source = document.createElement('source');
+                source.src = path;
+                const mime = MIME_MAP[extOf(path)];
+                if (mime) source.type = mime;
+                mediaEl.appendChild(source);
+
+                wrapper.classList.toggle('is-audio', isAudio);
+                wrapper.insertBefore(mediaEl, fallbackMsg);
+
+                attachEvents(mediaEl);
+                mediaEl.load();
+
+                // اگر بعد از ۵ ثانیه چیزی بارگذاری نشد
+                fallbackTimer = setTimeout(function() {
+                    if (mediaEl && mediaEl.readyState === 0) {
+                        showFallback();
+                    }
+                }, 5000);
+            }
+
+            // ---- شروع ----
+            const mediaPath = CONFIG.MEDIA_FILE || CONFIG.VIDEO_FILE || '';
+            const mediaMode = CONFIG.MEDIA_TYPE || 'auto';
+
+            if (mediaPath) {
+                loadMedia(mediaPath, mediaMode);
+            } else {
+                showFallback();
+            }
 
             // ---- Dark / Light Mode ----
             const toggle = document.getElementById('themeToggle');
